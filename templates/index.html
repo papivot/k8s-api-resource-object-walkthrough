@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" >
+    <meta charset="UTF-8" >
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-select.css') }}" />    
+    <title>Kubernetes Resource Viewer</title>
+</head>
+
+<body> 
+    <div class="container">
+        <nav class="navbar bg-primary">
+            <span class="navbar-brand mb-0 h1">Kubernetes Resource and Object Viewer</span>
+        </nav>
+
+        <div class="row">     
+            <div class="col-md-12">
+                <p> <h5><kbd>INSTRUCTIONS</kbd></h5></p>
+                <ul>
+                    <li> Use the drop-down and filters to select the API group (including <b>core/v1</b>). The application will use the preferred API version to get the list of resources for the API. </li>
+                    <li> Use the drop-down and filters to select the resource/kind associated with the API chosen in the previous step. Resources that are namespaced are suffixed with an <b>*</b>. </li>
+                    <li> For a namespaced resource, select the namespace you need to get details on the API objects of the resource type chosen in previous step.  </li>
+                    <li> Select the name of object (* for all) to view the details.</li>
+                    <li> The JSON formatted output of the/list of API objects is displayed.</li>
+                </ul>
+            </div>
+
+            <div class="col-md-12" id="resulttext">
+                <p> <h5><kbd>FILTER</kbd></h5></p>
+            </div>
+            
+            <div class="col-md-6">
+                <select name="api" id="api" data-live-search="true" data-size="10" class="form-control" title="Select API Group including core" data-header="Select an API group">
+                {% for row in api_list %}
+                <option value="{{ row[0] }}">{{ row[1] }}</option>
+                {% endfor %}
+                </select>
+            </div>
+           
+            <div class="col-md-6">
+                <select name="resource" id="resource" data-live-search="true" data-size="10" class="form-control" title="Select Resource Group/Kind" data-header="Select a Resource Group"> </select>
+            </div>
+           
+            <div class="col-md-6" id="namespacediv">
+                <select name="namespace" id="namespace" data-live-search="true" data-size="10" class="form-control" title="Select Namespace, * for all" data-header="Select a Namespace"> </select>
+            </div>   
+
+            <div class="col-md-6" id="k8sobjects">
+                <select name="objectsel" id="objectsel" data-live-search="true" data-size="10" class="form-control" title="Select an Object, * for all" data-header="Select an Object"> </select>
+            </div>
+
+            <div class="col-md-12" id="resulttext">
+                <p> <h5><kbd>OUTPUT</kbd></h5></p>
+            </div>
+
+            <div class="col-md-12" id="result">               
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static',filename='jquery.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='bootstrap-select.js') }}"></script>
+    <script src="{{ url_for('static',filename='renderjson.js') }}"></script>
+    <script>
+        $(document).ready(function () {
+            $("#api").selectpicker("refresh");
+            $("#resource").selectpicker("refresh");
+            $("#namespace").selectpicker("refresh");
+            $("#objectsel").selectpicker("refresh");
+
+            // Triggered when the API dropdown field is modified
+            function load_data(type, category_id) {
+                $.ajax({
+                    url: "/resource/"+category_id,
+                    method: "POST",
+                    data: { type: type, category_id: category_id },
+                    dataType: "json",
+                    success: function (data) { //alert(category_id)
+                        var html = "";
+                        var ns = "";
+                        for (var count = 0; count < data.length; count++) {
+                            ns = data[count];
+                            if(ns[1] == true) {
+                                html += '<option value="' + data[count][0] + ' *">' + data[count][0] + " *</option>";
+                            } else {
+                                html += '<option value="' + data[count][0] + '">' + data[count][0] + "</option>";
+                            }                          
+                        }
+                        if (type == "apiData") {
+                            $("#api").html(html);
+                            $("#api").selectpicker("refresh");
+                        } else {
+                            $("#resource").html(html);
+                            $("#resource").selectpicker("refresh");
+                            $("#namespace").html("");
+                            $("#namespace").selectpicker("refresh");
+                            $("#objectsel").html("");
+                            $("#objectsel").selectpicker("refresh");
+                            $("#result").html("");
+                            $("#result").selectpicker("refresh");
+                        }
+                    },
+                });
+            }
+
+            // Triggered when the Resource dropdown field is modified (for a namespaced object)
+            function load_data_ns(type, category_id) {
+                $.ajax({
+                    url: "/namespace",
+                    method: "POST",
+                    data: { type: type, category_id: category_id },
+                    dataType: "json",
+                    success: function (data) { //alert(category_id)
+                        var html = "";
+
+                        for (var count = 0; count < data.length; count++) {
+                            html += '<option value="' + data[count] + '">' + data[count] + "</option>";
+                        }
+                        if (type == "apiData") {
+                            $("#api").html(html);
+                            $("#api").selectpicker("refresh");
+                        } else {
+                            $("#namespace").html(html);    
+                            $("#namespace").selectpicker("refresh");
+                            $("#objectsel").html("");
+                            $("#objectsel").selectpicker("refresh");
+                            $("#result").html("");
+                            $("#result").selectpicker("refresh");
+                        }
+                    },
+                });
+            }
+
+            // Triggered when the Resource dropdown field is modified (for a non-namespaced object)
+            function load_data_obj(type, category_id) {
+                $.ajax({
+                    url: "/obj/"+category_id,
+                    method: "POST",
+                    data: { type: type, category_id: category_id },
+                    dataType: "json",
+                    success: function (data) { //alert(category_id)
+                        var html = "";
+
+                        for (var count = 0; count < data.length; count++) {
+                            html += '<option value="' + data[count] + '">' + data[count] + "</option>";
+                        }
+                        if (type == "apiData") {
+                            $("#api").html(html);
+                            $("#api").selectpicker("refresh");
+                        } else {
+                            $("#objectsel").html(html);    
+                            $("#objectsel").selectpicker("refresh");
+                            $("#result").html("");
+                            $("#result").selectpicker("refresh");
+                        }
+                    },
+                });
+            }
+
+            // Triggered when the Namespace dropdown field is modified (for a namespaced object)
+            function load_data_ns_obj(type, category_id) {
+                $.ajax({
+                    url: "/namespaced-obj/"+category_id,
+                    method: "POST",
+                    data: { type: type, category_id: category_id },
+                    dataType: "json",
+                    success: function (data) { //alert(category_id)
+                        var html = "";
+
+                        for (var count = 0; count < data.length; count++) {
+                            html += '<option value="' + data[count] + '">' + data[count] + "</option>";
+                        }
+                        if (type == "apiData") {
+                            $("#api").html(html);
+                            $("#api").selectpicker("refresh");
+                        } else {
+                            $("#objectsel").html(html);    
+                            $("#objectsel").selectpicker("refresh");
+                            $("#result").html("");
+                            $("#result").selectpicker("refresh");
+                        }
+                    },
+                });
+            }
+
+            // Triggered when the non-namespaced object of type * is selected
+            function load_data_json(type, category_id) {
+                $.ajax({
+                    url: "/objdetail/"+category_id,
+                    method: "POST",
+                    data: { type: type, category_id: category_id },
+                    dataType: "json",
+                    success: function (data) { //alert(category_id)
+                        renderjson.set_show_to_level(3);
+                        renderjson.set_sort_objects(true);
+                        $("#result").html($(renderjson(data)));
+                    },
+                });
+            }
+
+            // Triggered when the namespaced object of type * is selected
+            function load_data_json_namespaced(type, category_id) {
+                $.ajax({
+                    url: "/namespaced-objdetail/"+category_id,
+                    method: "POST",
+                    data: { type: type, category_id: category_id },
+                    dataType: "json",
+                    success: function (data) { //alert(category_id)
+                        renderjson.set_show_to_level(3);
+                        renderjson.set_sort_objects(true);
+                        $("#result").html($(renderjson(data)));
+                    },
+                });
+            }
+
+            // Triggered when the non-namespaced object is selected
+            function load_data_json_individual(type, category_id) {
+                $.ajax({
+                    url: "/individualobjdetail/"+category_id,
+                    method: "POST",
+                    data: { type: type, category_id: category_id },
+                    dataType: "json",
+                    success: function (data) { //alert(category_id)
+                        renderjson.set_show_to_level(10);
+                        renderjson.set_sort_objects(true);
+                        $("#result").html($(renderjson(data)));
+                    },
+                });
+            }
+
+            // Triggered when the namespaced object is selected
+            function load_data_json_namespaced_individual(type, category_id) {
+                $.ajax({
+                    url: "/individualnamespaced-objdetail/"+category_id,
+                    method: "POST",
+                    data: { type: type, category_id: category_id },
+                    dataType: "json",
+                    success: function (data) { //alert(category_id)
+                        renderjson.set_show_to_level(10);
+                        renderjson.set_sort_objects(true);
+                        $("#result").html($(renderjson(data)));
+                    },
+                });
+            }
+
+            // Update the resource dropdown list based on the API choice
+            $(document).on("change", "#api", function () {
+                var category_id = $("#api").val();
+                load_data("resourceData", category_id);
+            });
+
+            // Update the namespace dropdown list if the resource is namespaced or hide if non-namespaced, based on Namsespace choice
+            // If a non-namespaced resource is selected, update the objects dropdown list, based on Namsespace choice
+            $(document).on("change", "#resource", function () {
+                var category_id = "";
+                var api = $("#api").val();
+                var res = $("#resource").val();
+
+                if (res.endsWith(" *") == false){
+                    category_id = api+"/"+res;
+                    $("#namespacediv").hide();
+                    load_data_obj("jsonObjData", category_id);
+                } else {
+                    category_id = $("#resource").val();
+                    $("#namespacediv").show();
+                    load_data_ns("jsonData", category_id);
+                }         
+            });
+
+            // Update the objects dropdown list for namespaced objects, based on Namsespace choice
+            $(document).on("change", "#namespace", function () {
+                var category_id = "";
+                var api = $("#api").val();
+                var res = $("#resource").val().slice(0,-2);
+                var nsd = $("#namespace").val();
+                if (nsd == "*"){
+                    category_id = api+"/"+res;
+                    load_data_json("jsonData", category_id)
+                } else {
+                    category_id = api+"/"+nsd+"/"+res;
+                    load_data_ns_obj("jsonNSObjData", category_id);   
+                }
+                
+                
+            });
+
+            // Call the relevent detailed data display option, based on Object choice
+            $(document).on("change", "#objectsel", function () {
+                var category_id = "";
+                var api = $("#api").val();
+                var res = $("#resource").val();
+                var nsd
+                var obj = $("#objectsel").val();
+                
+                if (res.endsWith(" *") == false){
+                    if (obj == "*"){
+                        category_id = api+"/"+res;
+                        load_data_json("jsonData", category_id);
+                    } else {
+                        category_id = api+"/"+res+"/"+obj;
+                        load_data_json_individual("jsonData", category_id);
+                    }     
+                } else {
+                    nsd = $("#namespace").val();
+                    res = $("#resource").val().slice(0,-2);
+                    if (obj == "*"){
+                        category_id = api+"/"+nsd+"/"+res;
+                        load_data_json_namespaced("jsonNSData", category_id);
+                    } else {
+                        category_id = api+"/"+nsd+"/"+res+"/"+obj;
+                        load_data_json_namespaced_individual("jsonNSData", category_id);
+                    }    
+                }
+            });            
+        });
+    </script>   
+</body>
+</html>

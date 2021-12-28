@@ -4,25 +4,31 @@ Are you tired of typing `kubectl get ....` ? Want to know what APIs are register
 
 Launch it as a standalone app or execute it from a Kubernetes cluster. Access the application from a browser and filter through the various APIs, resources and namespaces to get complete datails of various Kubernetes objects. 
 
-- Main Menu - 
-  ![Access the main page](/images/main.png)
+Main Menu - 
+
+  ![](/images/main.png)
 
 Use the provided filters to narrow your search results - 
 
 - Select the API group (including core/v1)
-  ![API group](/images/apigroup.png)
+  
+  ![](/images/apigroup.png)
 
 - Based on the API group selected, select the resource - 
-  ![Resource](images/resource.png)
+  
+  ![](images/resource.png)
 
 - If Namespaced resource was selected in the previous option, select the relevent namespace -
-  ![Namespace](images/namespace.png)
+  
+  ![](images/namespace.png)
 
 - Select the relavent object to get the details on it - 
-  ![Object](images/object.png)
+  
+  ![](images/object.png)
 
-- Get a detailed JSON output of the relavent object =
-  ![Output](images/result.png)
+Get a detailed JSON output of the relavent object =
+  
+  ![](images/result.png)
 
 ## Executing as a standalone Python app
 

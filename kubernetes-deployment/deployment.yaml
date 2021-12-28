@@ -1,27 +1,27 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: k8s-operations
+  name: k8s-papivot-tools
   labels:
-    name: k8s-operations
-    app: k8s-operations
+    name: k8s-papivot-tools
+    app: k8s-papivot-tools
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: k8s-operations-sa
-  namespace: k8s-operations
+  name: k8s-papivot-tools-sa
+  namespace: k8s-papivot-tools
   labels:
-    name: k8s-operations
-    app: k8s-operations
+    name: k8s-papivot-tools
+    app: k8s-papivot-tools
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: k8s-operations-cr
+  name: k8s-papivot-tools-cr
   labels:
-    app: k8s-operations
-    name: k8s-operations
+    app: k8s-papivot-tools
+    name: k8s-papivot-tools
 rules:
   - apiGroups:
     - '*'
@@ -35,51 +35,51 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: k8s-operations-crb
+  name: k8s-papivot-tools-crb
   labels:
-    app: k8s-operations
-    name: k8s-operations
+    app: k8s-papivot-tools
+    name: k8s-papivot-tools
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: k8s-operations-cr
+  name: k8s-papivot-tools-cr
 subjects:
 - kind: ServiceAccount
-  name: k8s-operations-sa
-  namespace: k8s-operations
+  name: k8s-papivot-tools-sa
+  namespace: k8s-papivot-tools
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: k8s-operations
-    name: k8s-operations
-  name: k8s-operations-svc
-  namespace: k8s-operations
+    app: k8s-papivot-tools
+    name: k8s-papivot-tools
+  name: k8s-papivot-tools-svc
+  namespace: k8s-papivot-tools
 spec:
   ports:
     - name: http
       port: 80
       targetPort: 5000
   selector:
-    app: k8s-operations
+    app: k8s-papivot-tools
   type: LoadBalancer
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    name: k8s-operations
-    app: k8s-operations
-  name: k8s-operations-deployment
-  namespace: k8s-operations
+    name: k8s-papivot-tools
+    app: k8s-papivot-tools
+  name: k8s-papivot-tools-deployment
+  namespace: k8s-papivot-tools
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: k8s-operations
+      app: k8s-papivot-tools
       version: v1
   strategy:
     rollingUpdate:
@@ -89,7 +89,7 @@ spec:
   template:
     metadata:
       labels:
-        app: k8s-operations
+        app: k8s-papivot-tools
         version: v1
     spec:
       containers:
@@ -98,9 +98,9 @@ spec:
           value: "1"
         - name: CLUSTER_NAME
           value: "clustername.demo.local"
-        image: whoami6443/k8sapiwalkthru:0.0.2
+        image: whoami6443/k8sapiwalkthru:0.0.3
         imagePullPolicy: Always
-        name: k8s-operations
+        name: k8s-papivot-tools
         ports:
         - containerPort: 5000
           protocol: TCP
@@ -130,6 +130,6 @@ spec:
       dnsPolicy: ClusterFirst
       schedulerName: default-scheduler
       securityContext: {}
-      serviceAccount: k8s-operations-sa
-      serviceAccountName: k8s-operations-sa
+      serviceAccount: k8s-papivot-tools-sa
+      serviceAccountName: k8s-papivot-tools-sa
       terminationGracePeriodSeconds: 30

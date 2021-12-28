@@ -1,8 +1,8 @@
 # A Simple Python Flask App to view Kubernetes Objects 
 
-Are you tired of typing `kubectl get ....` ? Want to know what APIs are registered in your Kuberntes cluster? Do you know all the API Resources in your Kuberntes cluster? Want to view all these using a handy browwer UI? Then this is the solution for you !!
+Are you tired of typing `kubectl get ....` ? Do you want to know which APIs are registered in your Kubernetes cluster, or all the API resources in your Kubernetes cluster? Want to view these using a handy browser UI? Then this is the solution for you!
 
-Launch it as a standalone app or execute it from a Kubernetes cluster. Access the application from a browser and filter through the various APIs, resources and namespaces to get complete datails of various Kubernetes objects. 
+Launched as a standalone app or executed from within a Kubernetes cluster, this app can make your life much easier. Access the application from a browser and filter through the various APIs, Resources, and Namespaces to view the complete details of various Kubernetes objects.
 
 Main Menu - 
 

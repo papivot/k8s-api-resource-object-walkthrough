@@ -3,8 +3,6 @@ import urllib3
 import requests
 from kubernetes import client, config
 from kubernetes.client import configuration
-# from pprint import pprint
-# from flask import Flask, render_template, request, jsonify
 from flask import Flask, render_template, jsonify
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -18,7 +16,6 @@ def get_kubeapi_request(httpsession, path,header):
         return 0
 
 app = Flask(__name__)
-#app.debug = True
 
 @app.route('/', methods=['GET','POST'])
 def index():

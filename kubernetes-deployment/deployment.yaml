@@ -98,7 +98,7 @@ spec:
           value: "1"
         - name: CLUSTER_NAME
           value: "clustername.demo.local"
-        image: whoami6443/k8sapiwalkthru:0.0.4
+        image: whoami6443/k8sapiwalkthru:0.0.5
         imagePullPolicy: Always
         name: k8s-papivot-tools
         ports:

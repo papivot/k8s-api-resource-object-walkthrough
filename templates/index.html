@@ -4,6 +4,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" >
     <meta charset="UTF-8" >
     <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='codemirror.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='lesser-dark.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='foldgutter.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-select.css') }}" />    
     <title>Kubernetes Resource Viewer</title>
 </head>
@@ -54,15 +57,29 @@
                 <p> <h5><kbd>OUTPUT</kbd></h5></p>
             </div>
 
-            <div class="col-md-12" id="result">               
+            <div class="col-md-12" id="result">  
+                <div class="form-group green-border-focus">
+                    <label for="formlabel">JSON formated output</label>
+                    <textarea class="form-control" id="htmldata" height=100%></textarea>
+                </div>
             </div>
+
         </div>
     </div>
 
     <script src="{{ url_for('static',filename='jquery.min.js') }}"></script>
     <script src="{{ url_for('static',filename='bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static',filename='bootstrap-select.js') }}"></script>
-    <script src="{{ url_for('static',filename='renderjson.js') }}"></script>
+    <script src="{{ url_for('static',filename='codemirror.js') }}"></script>
+    <script src="{{ url_for('static',filename='javascript.js') }}"></script>
+    <script src="{{ url_for('static',filename='foldcode.js') }}"></script>
+    <script src="{{ url_for('static',filename='foldgutter.js') }}"></script>
+    <script src="{{ url_for('static',filename='brace-fold.js') }}"></script>
+    <script src="{{ url_for('static',filename='indent-fold.js') }}"></script>
+    <script src="{{ url_for('static',filename='markdown-fold.js') }}"></script>
+    <script src="{{ url_for('static',filename='xml-fold.js') }}"></script>
+    <script src="{{ url_for('static',filename='comment-fold.js') }}"></script>
+    <script src="{{ url_for('static',filename='active-line.js') }}"></script>
     <script>
         $(document).ready(function () {
             $("#api").selectpicker("refresh");
@@ -98,8 +115,10 @@
                             $("#namespace").selectpicker("refresh");
                             $("#objectsel").html("");
                             $("#objectsel").selectpicker("refresh");
-                            $("#result").html("");
-                            $("#result").selectpicker("refresh");
+                            
+                            var textarea_editor = document.getElementById('htmldata');
+                            textarea_editor.innerHTML = "";
+                            $(".CodeMirror").remove();
                         }
                     },
                 });
@@ -126,8 +145,10 @@
                             $("#namespace").selectpicker("refresh");
                             $("#objectsel").html("");
                             $("#objectsel").selectpicker("refresh");
-                            $("#result").html("");
-                            $("#result").selectpicker("refresh");
+
+                            var textarea_editor = document.getElementById('htmldata');
+                            textarea_editor.innerHTML = "";
+                            $(".CodeMirror").remove();
                         }
                     },
                 });
@@ -152,8 +173,10 @@
                         } else {
                             $("#objectsel").html(html);    
                             $("#objectsel").selectpicker("refresh");
-                            $("#result").html("");
-                            $("#result").selectpicker("refresh");
+
+                            var textarea_editor = document.getElementById('htmldata');
+                            textarea_editor.innerHTML = "";
+                            $(".CodeMirror").remove();
                         }
                     },
                 });
@@ -178,8 +201,10 @@
                         } else {
                             $("#objectsel").html(html);    
                             $("#objectsel").selectpicker("refresh");
-                            $("#result").html("");
-                            $("#result").selectpicker("refresh");
+
+                            var textarea_editor = document.getElementById('htmldata');
+                            textarea_editor.innerHTML = "";
+                            $(".CodeMirror").remove();
                         }
                     },
                 });
@@ -192,10 +217,46 @@
                     method: "POST",
                     data: { type: type, category_id: category_id },
                     dataType: "json",
-                    success: function (data) { //alert(category_id)
-                        renderjson.set_show_to_level(3);
-                        renderjson.set_sort_objects(true);
-                        $("#result").html($(renderjson(data)));
+                    success: function (data) { 
+                        // Clean up text editor before progressing
+                        var textarea_editor = document.getElementById('htmldata');
+                        textarea_editor.innerHTML = "";
+                        $(".CodeMirror").remove();
+
+                        jsondata = JSON.stringify(data, null, 2)                       
+                        textarea_editor.value = jsondata;
+                        editor = CodeMirror.fromTextArea(textarea_editor, {
+                            tabSize: 4,
+                            mode: {name: "javascript", json: true},
+                            theme: 'lesser-dark',
+                            styleActiveLine: true,
+                            readOnly: true,
+                            lineNumbers: true,
+                            foldGutter: true,
+                            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                            foldOptions: {
+                                widget: (from, to) => {
+                                    var count = undefined;
+                                    // Get open / close token
+                                    var startToken = '{', endToken = '}';        
+                                    var prevLine = window.editor.getLine(from.line);
+                                    if (prevLine.lastIndexOf('[') > prevLine.lastIndexOf('{')) {
+                                        startToken = '[', endToken = ']';
+                                    }
+                                    // Get json content
+                                    var internal = window.editor.getRange(from, to);
+                                    var toParse = startToken + internal + endToken;
+                                    // Get key count
+                                    try {
+                                        var parsed = JSON.parse(toParse);
+                                        count = Object.keys(parsed).length;
+                                    } catch(e) { }
+                                    return count ? `\u21A4${count}\u21A6` : '\u2194';
+                                }
+                            },
+                            lineWrapping: true
+                        });
+                        editor.foldCode(CodeMirror.Pos(0,0));
                     },
                 });
             }
@@ -207,10 +268,46 @@
                     method: "POST",
                     data: { type: type, category_id: category_id },
                     dataType: "json",
-                    success: function (data) { //alert(category_id)
-                        renderjson.set_show_to_level(3);
-                        renderjson.set_sort_objects(true);
-                        $("#result").html($(renderjson(data)));
+                    success: function (data) { 
+                        // Clean up text editor before progressing
+                        var textarea_editor = document.getElementById('htmldata');
+                        textarea_editor.innerHTML = "";
+                        $(".CodeMirror").remove();
+
+                        jsondata = JSON.stringify(data, null, 2)                       
+                        textarea_editor.value = jsondata;
+                        editor = CodeMirror.fromTextArea(textarea_editor, {
+                            tabSize: 4,
+                            mode: {name: "javascript", json: true},
+                            theme: 'lesser-dark',
+                            styleActiveLine: true,
+                            readOnly: true,
+                            lineNumbers: true,
+                            foldGutter: true,
+                            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                            foldOptions: {
+                                widget: (from, to) => {
+                                    var count = undefined;
+                                    // Get open / close token
+                                    var startToken = '{', endToken = '}';        
+                                    var prevLine = window.editor.getLine(from.line);
+                                    if (prevLine.lastIndexOf('[') > prevLine.lastIndexOf('{')) {
+                                        startToken = '[', endToken = ']';
+                                    }
+                                    // Get json content
+                                    var internal = window.editor.getRange(from, to);
+                                    var toParse = startToken + internal + endToken;
+                                    // Get key count
+                                    try {
+                                        var parsed = JSON.parse(toParse);
+                                        count = Object.keys(parsed).length;
+                                    } catch(e) { }
+                                    return count ? `\u21A4${count}\u21A6` : '\u2194';
+                                }
+                            },
+                            lineWrapping: true
+                        });
+                        editor.foldCode(CodeMirror.Pos(0,0));
                     },
                 });
             }
@@ -222,10 +319,46 @@
                     method: "POST",
                     data: { type: type, category_id: category_id },
                     dataType: "json",
-                    success: function (data) { //alert(category_id)
-                        renderjson.set_show_to_level(10);
-                        renderjson.set_sort_objects(true);
-                        $("#result").html($(renderjson(data)));
+                    success: function (data) { 
+                        // Clean up text editor before progressing
+                        var textarea_editor = document.getElementById('htmldata');
+                        textarea_editor.innerHTML = "";
+                        $(".CodeMirror").remove();
+
+                        jsondata = JSON.stringify(data, null, 2)                       
+                        textarea_editor.value = jsondata;
+                        editor = CodeMirror.fromTextArea(textarea_editor, {
+                            tabSize: 4,
+                            mode: {name: "javascript", json: true},
+                            theme: 'lesser-dark',
+                            styleActiveLine: true,
+                            readOnly: true,
+                            lineNumbers: true,
+                            foldGutter: true,
+                            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                            foldOptions: {
+                                widget: (from, to) => {
+                                    var count = undefined;
+                                    // Get open / close token
+                                    var startToken = '{', endToken = '}';        
+                                    var prevLine = window.editor.getLine(from.line);
+                                    if (prevLine.lastIndexOf('[') > prevLine.lastIndexOf('{')) {
+                                        startToken = '[', endToken = ']';
+                                    }
+                                    // Get json content
+                                    var internal = window.editor.getRange(from, to);
+                                    var toParse = startToken + internal + endToken;
+                                    // Get key count
+                                    try {
+                                        var parsed = JSON.parse(toParse);
+                                        count = Object.keys(parsed).length;
+                                    } catch(e) { }
+                                    return count ? `\u21A4${count}\u21A6` : '\u2194';
+                                }
+                            },
+                            lineWrapping: true
+                        });
+                        editor.foldCode(CodeMirror.Pos(0,0));
                     },
                 });
             }
@@ -237,10 +370,47 @@
                     method: "POST",
                     data: { type: type, category_id: category_id },
                     dataType: "json",
-                    success: function (data) { //alert(category_id)
-                        renderjson.set_show_to_level(10);
-                        renderjson.set_sort_objects(true);
-                        $("#result").html($(renderjson(data)));
+                    success: function (data) { 
+
+                        // Clean up text editor before progressing
+                        var textarea_editor = document.getElementById('htmldata');
+                        textarea_editor.innerHTML = "";
+                        $(".CodeMirror").remove();
+
+                        jsondata = JSON.stringify(data, null, 2)                       
+                        textarea_editor.value = jsondata;
+                        editor = CodeMirror.fromTextArea(textarea_editor, {
+                            tabSize: 4,
+                            mode: {name: "javascript", json: true},
+                            theme: 'lesser-dark',
+                            styleActiveLine: true,
+                            readOnly: true,
+                            lineNumbers: true,
+                            foldGutter: true,
+                            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                            foldOptions: {
+                                widget: (from, to) => {
+                                    var count = undefined;
+                                    // Get open / close token
+                                    var startToken = '{', endToken = '}';        
+                                    var prevLine = window.editor.getLine(from.line);
+                                    if (prevLine.lastIndexOf('[') > prevLine.lastIndexOf('{')) {
+                                        startToken = '[', endToken = ']';
+                                    }
+                                    // Get json content
+                                    var internal = window.editor.getRange(from, to);
+                                    var toParse = startToken + internal + endToken;
+                                    // Get key count
+                                    try {
+                                        var parsed = JSON.parse(toParse);
+                                        count = Object.keys(parsed).length;
+                                    } catch(e) { }
+                                    return count ? `\u21A4${count}\u21A6` : '\u2194';
+                                }
+                            },
+                            lineWrapping: true
+                        });
+                        editor.foldCode(CodeMirror.Pos(0,0)); 
                     },
                 });
             }

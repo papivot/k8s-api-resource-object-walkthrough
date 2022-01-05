@@ -1,0 +1,11 @@
+/* remove rounding from cards, buttons and inputs */
+body {
+    color: #ddd;
+    background-color: #333;
+    font-size: small;
+ }
+
+ .CodeMirror {
+    font-family:'Courier New', Courier, monospace; 
+    font-size: small;
+    }

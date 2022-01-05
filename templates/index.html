@@ -5,6 +5,7 @@
     <meta charset="UTF-8" >
     <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename='codemirror.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='custom.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename='lesser-dark.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename='foldgutter.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-select.css') }}" />    
@@ -25,7 +26,7 @@
                     <li> Use the drop-down and filters to select the resource/kind associated with the API chosen in the previous step. Resources that are namespaced are suffixed with an <b>*</b>. </li>
                     <li> For a namespaced resource, select the namespace you need to get details on the API objects of the resource type chosen in previous step.  </li>
                     <li> Select the name of object (* for all) to view the details.</li>
-                    <li> The JSON formatted output of the/list of API objects is displayed.</li>
+                    <li> The JSON and YAML formatted outputs of the/list of API objects is displayed.</li>
                 </ul>
             </div>
 
@@ -57,10 +58,17 @@
                 <p> <h5><kbd>OUTPUT</kbd></h5></p>
             </div>
 
-            <div class="col-md-12" id="result">  
+            <div class="col-md-6" id="result">  
                 <div class="form-group green-border-focus">
-                    <label for="formlabel">JSON formated output</label>
+                    <label for="formlabel">JSON formatted output</label>
                     <textarea class="form-control" id="htmldata" height=100%></textarea>
+                </div>
+            </div>
+
+            <div class="col-md-6" id="resultyaml">  
+                <div class="form-group green-border-focus">
+                    <label for="formlabel">YAML formatted output</label>
+                    <textarea class="form-control" id="htmldatayaml" height=100%></textarea>
                 </div>
             </div>
 
@@ -70,8 +78,10 @@
     <script src="{{ url_for('static',filename='jquery.min.js') }}"></script>
     <script src="{{ url_for('static',filename='bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static',filename='bootstrap-select.js') }}"></script>
+    <script src="{{ url_for('static',filename='json2yaml.js') }}"></script>
     <script src="{{ url_for('static',filename='codemirror.js') }}"></script>
     <script src="{{ url_for('static',filename='javascript.js') }}"></script>
+    <script src="{{ url_for('static',filename='yaml.js') }}"></script>
     <script src="{{ url_for('static',filename='foldcode.js') }}"></script>
     <script src="{{ url_for('static',filename='foldgutter.js') }}"></script>
     <script src="{{ url_for('static',filename='brace-fold.js') }}"></script>
@@ -220,13 +230,18 @@
                     success: function (data) { 
                         // Clean up text editor before progressing
                         var textarea_editor = document.getElementById('htmldata');
+                        var textarea_editor1 = document.getElementById('htmldatayaml');
                         textarea_editor.innerHTML = "";
+                        textarea_editor1.innerHTML = "";                       
                         $(".CodeMirror").remove();
 
-                        jsondata = JSON.stringify(data, null, 2)                       
+                        jsondata = JSON.stringify(data,null,2);
+                        yamldata = YAML.stringify(data,10,2); 
                         textarea_editor.value = jsondata;
+                        textarea_editor1.value = yamldata;
+
                         editor = CodeMirror.fromTextArea(textarea_editor, {
-                            tabSize: 4,
+                            tabSize: 2,
                             mode: {name: "javascript", json: true},
                             theme: 'lesser-dark',
                             styleActiveLine: true,
@@ -254,9 +269,22 @@
                                     return count ? `\u21A4${count}\u21A6` : '\u2194';
                                 }
                             },
-                            lineWrapping: true
+                            lineWrapping: false
                         });
-                        editor.foldCode(CodeMirror.Pos(0,0));
+
+                        editor1 = CodeMirror.fromTextArea(textarea_editor1, {
+                            tabSize: 2,
+                            mode: 'text/yaml',
+                            theme: 'lesser-dark',
+                            styleActiveLine: true,
+                            readOnly: true,
+                            lineNumbers: true,
+                            foldGutter: true,
+                            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                            lineWrapping: false
+                        });
+                        editor.foldCode(CodeMirror.Pos(20,0));
+                        editor1.foldCode(CodeMirror.Pos(20,0));
                     },
                 });
             }
@@ -271,13 +299,18 @@
                     success: function (data) { 
                         // Clean up text editor before progressing
                         var textarea_editor = document.getElementById('htmldata');
+                        var textarea_editor1 = document.getElementById('htmldatayaml');
                         textarea_editor.innerHTML = "";
+                        textarea_editor1.innerHTML = "";                       
                         $(".CodeMirror").remove();
 
-                        jsondata = JSON.stringify(data, null, 2)                       
+                        jsondata = JSON.stringify(data,null,2);
+                        yamldata = YAML.stringify(data,10,2); 
                         textarea_editor.value = jsondata;
+                        textarea_editor1.value = yamldata;
+
                         editor = CodeMirror.fromTextArea(textarea_editor, {
-                            tabSize: 4,
+                            tabSize: 2,
                             mode: {name: "javascript", json: true},
                             theme: 'lesser-dark',
                             styleActiveLine: true,
@@ -305,9 +338,22 @@
                                     return count ? `\u21A4${count}\u21A6` : '\u2194';
                                 }
                             },
-                            lineWrapping: true
+                            lineWrapping: false
                         });
-                        editor.foldCode(CodeMirror.Pos(0,0));
+
+                        editor1 = CodeMirror.fromTextArea(textarea_editor1, {
+                            tabSize: 2,
+                            mode: 'text/yaml',
+                            theme: 'lesser-dark',
+                            styleActiveLine: true,
+                            readOnly: true,
+                            lineNumbers: true,
+                            foldGutter: true,
+                            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                            lineWrapping: false
+                        });
+                        editor.foldCode(CodeMirror.Pos(20,0));
+                        editor1.foldCode(CodeMirror.Pos(20,0));
                     },
                 });
             }
@@ -322,13 +368,18 @@
                     success: function (data) { 
                         // Clean up text editor before progressing
                         var textarea_editor = document.getElementById('htmldata');
+                        var textarea_editor1 = document.getElementById('htmldatayaml');
                         textarea_editor.innerHTML = "";
+                        textarea_editor1.innerHTML = "";                       
                         $(".CodeMirror").remove();
 
-                        jsondata = JSON.stringify(data, null, 2)                       
+                        jsondata = JSON.stringify(data,null,2);
+                        yamldata = YAML.stringify(data,10,2); 
                         textarea_editor.value = jsondata;
+                        textarea_editor1.value = yamldata;
+
                         editor = CodeMirror.fromTextArea(textarea_editor, {
-                            tabSize: 4,
+                            tabSize: 2,
                             mode: {name: "javascript", json: true},
                             theme: 'lesser-dark',
                             styleActiveLine: true,
@@ -356,9 +407,22 @@
                                     return count ? `\u21A4${count}\u21A6` : '\u2194';
                                 }
                             },
-                            lineWrapping: true
+                            lineWrapping: false
                         });
-                        editor.foldCode(CodeMirror.Pos(0,0));
+
+                        editor1 = CodeMirror.fromTextArea(textarea_editor1, {
+                            tabSize: 2,
+                            mode: 'text/yaml',
+                            theme: 'lesser-dark',
+                            styleActiveLine: true,
+                            readOnly: true,
+                            lineNumbers: true,
+                            foldGutter: true,
+                            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                            lineWrapping: false
+                        });
+                        editor.foldCode(CodeMirror.Pos(20,0));
+                        editor1.foldCode(CodeMirror.Pos(20,0));
                     },
                 });
             }
@@ -374,13 +438,18 @@
 
                         // Clean up text editor before progressing
                         var textarea_editor = document.getElementById('htmldata');
+                        var textarea_editor1 = document.getElementById('htmldatayaml');
                         textarea_editor.innerHTML = "";
+                        textarea_editor1.innerHTML = "";                       
                         $(".CodeMirror").remove();
 
-                        jsondata = JSON.stringify(data, null, 2)                       
+                        jsondata = JSON.stringify(data,null,2);
+                        yamldata = YAML.stringify(data,10,2); 
                         textarea_editor.value = jsondata;
+                        textarea_editor1.value = yamldata;
+
                         editor = CodeMirror.fromTextArea(textarea_editor, {
-                            tabSize: 4,
+                            tabSize: 2,
                             mode: {name: "javascript", json: true},
                             theme: 'lesser-dark',
                             styleActiveLine: true,
@@ -408,9 +477,22 @@
                                     return count ? `\u21A4${count}\u21A6` : '\u2194';
                                 }
                             },
-                            lineWrapping: true
+                            lineWrapping: false
                         });
-                        editor.foldCode(CodeMirror.Pos(0,0)); 
+
+                        editor1 = CodeMirror.fromTextArea(textarea_editor1, {
+                            tabSize: 2,
+                            mode: 'text/yaml',
+                            theme: 'lesser-dark',
+                            styleActiveLine: true,
+                            readOnly: true,
+                            lineNumbers: true,
+                            foldGutter: true,
+                            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                            lineWrapping: false
+                        });
+                        editor.foldCode(CodeMirror.Pos(20,0));
+                        editor1.foldCode(CodeMirror.Pos(20,0));
                     },
                 });
             }

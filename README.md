@@ -4,7 +4,7 @@ Are you tired of typing `kubectl get ....` ? Do you want to know which APIs are 
 
 Launched as a standalone app or executed from within a Kubernetes cluster, this app can make your life much easier. Access the application from a browser and filter through the various APIs, Resources, and Namespaces to view the complete details of various Kubernetes objects.
 
-Watch the video 
+Click the image below to watch a video of the product. 
 
 [![Watch the video](/images/screenshot.png)](https://youtu.be/7gkSOYGfK_Y)
 

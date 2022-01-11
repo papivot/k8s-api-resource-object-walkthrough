@@ -4,32 +4,9 @@ Are you tired of typing `kubectl get ....` ? Do you want to know which APIs are 
 
 Launched as a standalone app or executed from within a Kubernetes cluster, this app can make your life much easier. Access the application from a browser and filter through the various APIs, Resources, and Namespaces to view the complete details of various Kubernetes objects.
 
+Watch the video 
 
-Main Menu - 
-
-  ![](/images/main.png)
-
-Use the provided filters to narrow your search results - 
-
-- Select the API group (including core/v1)
-  
-  ![](/images/apigroup.png)
-
-- Based on the API group selected, select the resource - 
-  
-  ![](images/resource.png)
-
-- If Namespaced resource was selected in the previous option, select the relevent namespace -
-  
-  ![](images/namespace.png)
-
-- Select the relavent object to get the details on it - 
-  
-  ![](images/object.png)
-
-Get a detailed JSON output of the relavent object =
-  
-  ![](images/result.png)
+[![Watch the video](/images/screenshot.png)](https://youtu.be/7gkSOYGfK_Y)
 
 ## Executing as a standalone Python app
 

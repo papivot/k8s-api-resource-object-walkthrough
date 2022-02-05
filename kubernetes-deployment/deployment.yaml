@@ -48,23 +48,6 @@ subjects:
   name: k8s-obj-dump-sa
   namespace: k8s-papivot-tools
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: k8s-obj-dump
-    name: k8s-obj-dump
-  name: k8s-obj-dump-svc
-  namespace: k8s-papivot-tools
-spec:
-  ports:
-    - name: http
-      port: 80
-      targetPort: 5000
-  selector:
-    app: k8s-obj-dump
-  type: LoadBalancer
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:

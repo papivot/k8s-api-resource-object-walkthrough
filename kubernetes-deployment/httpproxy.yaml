@@ -1,0 +1,37 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: k8s-obj-dump
+    name: k8s-obj-dump
+  name: k8s-obj-dump-svc
+  namespace: k8s-papivot-tools
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 5000
+  selector:
+    app: k8s-obj-dump
+  type: ClusterIP
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  labels:
+    app: k8s-obj-dump
+    name: k8s-obj-dump
+  name: k8s-obj-dump-httpproxy
+  namespace: k8s-papivot-tools
+spec:
+  routes:
+  - conditions:
+    - prefix: /
+    services:
+    - name: k8s-obj-dump-svc
+      port: 80
+  virtualhost:
+    fqdn: k8s-obj.k8s.lab.test
+    tls:
+      secretName: k8s-obj-dump-tls

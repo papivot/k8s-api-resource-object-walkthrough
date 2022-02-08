@@ -32,5 +32,5 @@ spec:
       port: 80
   virtualhost:
     fqdn: k8s-obj.k8s.lab.test
-  tls:
-    secretName: k8s-obj-dump-tls
+    tls:
+      secretName: k8s-obj-dump-tls

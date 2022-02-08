@@ -12,7 +12,7 @@ apiVersion: cert-manager.io/v1
     name: k8s-obj-dump-ca
     namespace: k8s-papivot-tools
   spec:
-    commonName: k8s-obj-dump CA
+    commonName: k8s-obj-dumpCA
     dnsNames:
     - k8s-obj-dumpca
     duration: 87600h0m0s

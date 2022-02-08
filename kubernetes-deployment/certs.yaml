@@ -1,0 +1,71 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: k8s-obj-dump-self-signed-ca-issuer
+  namespace: k8s-papivot-tools
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: k8s-obj-dump-ca
+    namespace: k8s-papivot-tools
+  spec:
+    commonName: k8s-obj-dump CA
+    dnsNames:
+    - k8s-obj-dumpca
+    duration: 87600h0m0s
+    isCA: true
+    issuerRef:
+      group: cert-manager.io
+      kind: Issuer
+      name: k8s-obj-dump-self-signed-ca-issuer
+    privateKey:
+      algorithm: RSA
+      encoding: PKCS1
+      size: 2048
+    renewBefore: 360h0m0s
+    secretName: k8s-obj-dump-ca-key-pair
+    subject:
+      organizations:
+      - Project k8s-obj-dump
+    usages:
+    - server auth
+    - client auth
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: k8s-obj-dump-ca-issuer
+  namespace: k8s-papivot-tools
+spec:
+  ca:
+    secretName: k8s-obj-dump-ca-key-pair
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: k8s-obj-dump-tls-cert
+  namespace: k8s-papivot-tools
+spec:
+  commonName: k8s-obj-dump
+  dnsNames:
+  - k8s-obj.k8s.lab.test
+  duration: 87600h0m0s
+  issuerRef:
+    group: cert-manager.io
+    kind: Issuer
+    name: k8s-obj-dump-ca-issuer
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  renewBefore: 360h0m0s
+  secretName: k8s-obj-dump-tls
+  subject:
+    organizations:
+    - Project k8s-obj-dump
+  usages:
+  - server auth
+  - client auth

@@ -1,31 +1,3 @@
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: k8s-obj-dump-tls-cert
-  namespace: k8s-papivot-tools
-spec:
-  commonName: prometheus
-  dnsNames:
-  - k8s-obj.k8s.lab.test
-  duration: 87600h0m0s
-  issuerRef:
-    group: cert-manager.io
-    kind: Issuer
-    name: k8s-obj-ca-issuer
-  privateKey:
-    algorithm: RSA
-    encoding: PKCS1
-    size: 2048
-  renewBefore: 360h0m0s
-  secretName: k8s-obj-dump-tls
-  subject:
-    organizations:
-    - Project K8s tools
-  usages:
-  - server auth
-  - client auth
----
 apiVersion: v1
 kind: Service
 metadata:

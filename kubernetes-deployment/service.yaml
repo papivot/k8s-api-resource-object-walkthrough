@@ -7,6 +7,8 @@ metadata:
     name: k8s-obj-dump
   name: k8s-obj-dump-svc
   namespace: k8s-papivot-tools
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: k8s-obj.k8s.lab.test
 spec:
   ports:
     - name: http

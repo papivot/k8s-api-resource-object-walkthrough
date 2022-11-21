@@ -17,4 +17,4 @@ spec:
   - name: INCLUSTER_CONFIG
     value: 1
   - name: CLUSTER_NAME
-    value: test.cluster.test
+    value: clustername.demo.local

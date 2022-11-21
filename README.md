@@ -31,4 +31,5 @@ Click the image below to watch a video of the product.
   - Modify the `image: whoami6443/k8sapiwalkthru:x.y.z` to a valid value if using a custom-built image. 
 - Deploy the application - `kubectl apply -f kubernetes-deployment/deployment.yaml`
 - Access the application using a browser, using the IP address of the service `k8s-papivot-tools-svc`. 
-- The application can also be exposed using a method of your choice - e.g., Istio, Ingress, Gateway, etc. 
+- The application can also be exposed using a method of your choice - e.g., Istio, Ingress, Gateway, etc.  
+- 

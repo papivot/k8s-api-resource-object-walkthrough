@@ -1,0 +1,17 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: test-workload
+  description: My first app
+  tags:
+    - app-accelerator
+    - python
+    - javascript
+    - web
+    - tanzu
+  annotations:
+    'backstage.io/kubernetes-label-selector': 'app.kubernetes.io/part-of=test-workload'
+spec:
+  type: service
+  lifecycle: experimental
+  owner: team-a

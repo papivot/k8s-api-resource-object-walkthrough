@@ -1,0 +1,20 @@
+apiVersion: carto.run/v1alpha1
+kind: Workload
+metadata:
+  name: test-workload
+  labels:
+    app.kubernetes.io/name: test-workload
+    app.kubernetes.io/part-of: test-workload
+    apps.tanzu.vmware.com/workload-type: web
+spec:
+  source:
+    git:
+      # update when code is pushed to a new location
+      url: https://github.com/papivot/k8s-api-resource-object-walkthrough.git 
+      ref:
+        branch: master
+  env:
+  - name: INCLUSTER_CONFIG
+    value: 1
+  - name: CLUSTER_NAME
+    value: test.cluster.test

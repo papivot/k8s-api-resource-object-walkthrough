@@ -4,7 +4,7 @@ metadata:
   name: test-workload
   labels:
     app.kubernetes.io/name: test-workload
-    app.kubernetes.io/part-of: test-workload
+    app.kubernetes.io/part-of: test-workload-1
     apps.tanzu.vmware.com/workload-type: web
 spec:
   source:

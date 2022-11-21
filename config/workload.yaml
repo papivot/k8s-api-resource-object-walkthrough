@@ -18,3 +18,5 @@ spec:
     value: 1
   - name: CLUSTER_NAME
     value: clustername.demo.local
+  - name: PORT
+    value: 5000
